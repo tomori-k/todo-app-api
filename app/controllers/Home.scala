@@ -14,25 +14,12 @@ import play.api.mvc._
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CreateFormData(
-    title:      String,
-    body:       String,
-    categoryId: Long
-)
-
-case class UpdateFormData(
-    title:      String,
-    body:       String,
-    categoryId: Long,
-    stateValue: Short
-)
-
 @Singleton
 class HomeController @Inject() (val controllerComponents: ControllerComponents)(
     implicit executionContext: ExecutionContext
 ) extends BaseController {
 
-  def list(): Action[AnyContent] = Action async { implicit req =>
+  def getAll: Action[AnyContent] = Action async { implicit req =>
     for {
       todoItems <- TodoRepository.getAllWithCategory()
     } yield Ok(
@@ -63,7 +50,7 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
       )
   }
 
-  def todoa(id: Long): Action[AnyContent] = Action async { implicit req =>
+  def get(id: Long): Action[AnyContent] = Action async { implicit req =>
     for {
       todoItem <- TodoRepository.get(Todo.Id(id))
     } yield todoItem match {
@@ -72,7 +59,7 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
     }
   }
 
-  def updatea(): Action[JsValue] = Action(parse.json).async { implicit req =>
+  def update(): Action[JsValue] = Action(parse.json).async { implicit req =>
     req.body
       .validate[JsValueTodoUpdate]
       .fold(
@@ -94,7 +81,7 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
                                 )
                               )
                             )
-                            .map(_ => Redirect(routes.HomeController.list()))
+                            .map(_ => Ok)
                         case None    =>
                           Future.successful(
                             NotFound("Not a such ID")
@@ -104,7 +91,7 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
       )
   }
 
-  def deletea(id: Long): Action[AnyContent] = Action async { implicit req =>
+  def delete(id: Long): Action[AnyContent] = Action async { implicit req =>
     TodoRepository
       .remove(Todo.Id(id))
       .map(_ => Ok)
