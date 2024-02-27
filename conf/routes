@@ -5,10 +5,11 @@
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file             controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
 
-GET           /todo/list                controllers.HomeController.getAll
-GET           /todo/$id<[0-9]+>         controllers.HomeController.get(id: Long)
-POST          /todo                     controllers.HomeController.create
-PUT           /todo                     controllers.HomeController.update
-DELETE        /todo/$id<[0-9+]+>        controllers.HomeController.delete(id: Long)
+GET           /todo/list                 controllers.HomeController.getAll
+GET           /todo/$id<[0-9]+>          controllers.HomeController.get(id: Long)
+POST          /todo                      controllers.HomeController.create
+PUT           /todo                      controllers.HomeController.update
+DELETE        /todo/$id<[0-9+]+>         controllers.HomeController.delete(id: Long)
+GET           /todo-category/list        controllers.HomeController.getAllCategories()
