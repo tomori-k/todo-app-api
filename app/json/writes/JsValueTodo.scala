@@ -8,7 +8,7 @@ case class JsValueTodo(
     title:    String,
     body:     String,
     state:    Short,
-    category: Option[String] // todo: category も JsValue を定義する
+    category: Option[JsValueTodoCategory]
 )
 
 object JsValueTodo {
@@ -20,6 +20,6 @@ object JsValueTodo {
       title    = todo.v.title,
       body     = todo.v.body,
       state    = todo.v.state.code,
-      category = todo.v.category.map(_.name)
+      category = todo.v.category.map(x => JsValueTodoCategory(x.toEmbeddedId))
     )
 }
