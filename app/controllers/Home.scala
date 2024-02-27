@@ -3,6 +3,7 @@
 
 package controllers
 
+import json.writes.JsValueTodo
 import lib.model.Todo.TodoState
 import lib.model.{Todo, TodoCategory}
 import lib.persistence.default._
@@ -10,6 +11,7 @@ import model.ViewValueHome
 import play.api.data.Form
 import play.api.data.Forms.{longNumber, mapping, nonEmptyText, shortNumber}
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import javax.inject._
@@ -45,16 +47,10 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
   }
 
   def list(): Action[AnyContent] = Action async { implicit req =>
-    val vv = ViewValueHome(
-      title  = "TODO",
-      cssSrc = Seq("main.css"),
-      jsSrc  = Seq("main.js")
-    )
     for {
       todoItems <- TodoRepository.getAllWithCategory()
     } yield Ok(
-      views.html.pages
-        .List(vv, todoItems.map(_.v))
+      Json.toJson(todoItems.map(x => JsValueTodo(x)))
     )
   }
 
@@ -138,31 +134,32 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
       jsSrc  = Seq("main.js")
     )
     for {
-      todoItem <- TodoRepository.get(Todo.Id(id))
+      todoItem   <- TodoRepository.get(Todo.Id(id))
+      categories <- todoItem match {
+                      case Some(_) => TodoCategoryRepository.getAll()
+                      case None    => Future.successful(Seq())
+                    }
     } yield {
       todoItem match {
         case Some(todoEntity) =>
-          for {
-            categories <- TodoCategoryRepository.getAll()
-          } yield {
-            Ok(
-              views.html.pages
-                .Edit(
-                  vv,
-                  todoEntity.id,
-                  updateForm.fill(
-                    UpdateFormData(
-                      title      = todoEntity.v.title,
-                      body       = todoEntity.v.body,
-                      categoryId = todoEntity.v.categoryId,
-                      stateValue = todoEntity.v.state.code
-                    )
-                  ),
-                  categories.map(_.v)
-                )
-            )
-          }
-        case None             => NotFound("No such a todo")
+          Ok(
+            views.html.pages
+              .Edit(
+                vv,
+                todoEntity.id,
+                updateForm.fill(
+                  UpdateFormData(
+                    title      = todoEntity.v.title,
+                    body       = todoEntity.v.body,
+                    categoryId = todoEntity.v.categoryId,
+                    stateValue = todoEntity.v.state.code
+                  )
+                ),
+                categories.map(_.v)
+              )
+          )
+
+        case None => NotFound("No such a todo")
       }
     }
   }

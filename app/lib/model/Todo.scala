@@ -19,7 +19,8 @@ case class Todo(
 
 object Todo {
   val Id = the[Identity[Id]]
-  type Id = Long @@ Todo
+  type Id         = Long @@ Todo
+  type EmbeddedId = Entity.EmbeddedId[Id, Todo]
 
   sealed abstract class TodoState(val code: Short, val name: String)
       extends EnumStatus
