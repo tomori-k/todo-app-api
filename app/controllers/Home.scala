@@ -3,7 +3,7 @@
 
 package controllers
 
-import json.reads.JsValueTodoCreate
+import json.reads.{JsValueTodoCreate, JsValueTodoUpdate}
 import json.writes.JsValueTodo
 import lib.model.Todo.TodoState
 import lib.model.{Todo, TodoCategory}
@@ -193,6 +193,38 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
         case None    => NotFound("No such a todo")
       }
     }
+  }
+
+  def updatea(): Action[JsValue] = Action(parse.json).async { implicit req =>
+    req.body
+      .validate[JsValueTodoUpdate]
+      .fold(
+        _ => Future.successful(BadRequest("Invalid body")),
+        todoUpdate =>
+          for {
+            todo   <- TodoRepository.get(Todo.Id(todoUpdate.id))
+            result <- todo match {
+                        case Some(x) =>
+                          TodoRepository
+                            .update(
+                              x.map(
+                                _.copy(
+                                  title      = todoUpdate.title,
+                                  body       = todoUpdate.body,
+                                  categoryId =
+                                    TodoCategory.Id(todoUpdate.categoryId),
+                                  state      = TodoState(todoUpdate.state)
+                                )
+                              )
+                            )
+                            .map(_ => Redirect(routes.HomeController.list()))
+                        case None    =>
+                          Future.successful(
+                            NotFound("Not a such ID")
+                          )
+                      }
+          } yield result
+      )
   }
 
   def update(id: Long): Action[AnyContent] = Action async { implicit req =>

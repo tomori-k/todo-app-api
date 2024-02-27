@@ -17,3 +17,4 @@ POST        /create                    controllers.HomeController.create
 POST        /update/$id<[0-9]+>        controllers.HomeController.update(id: Long)
 POST        /delete                    controllers.HomeController.delete()
 POST        /createa                   controllers.HomeController.postCreate
+PUT         /updatea                   controllers.HomeController.updatea
