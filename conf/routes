@@ -10,6 +10,7 @@ GET         /                          controllers.HomeController.index
 GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /list                      controllers.HomeController.list
+GET         /todoa/$id<[0-9]+>         controllers.HomeController.todoa(id: Long)
 GET         /category                  controllers.HomeController.category
 GET         /edit/$id<[0-9]+>          controllers.HomeController.edit(id: Long)
 GET         /todo/$id<[0-9]+>          controllers.HomeController.todo(id: Long)

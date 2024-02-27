@@ -195,6 +195,15 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
     }
   }
 
+  def todoa(id: Long): Action[AnyContent] = Action async { implicit req =>
+    for {
+      todoItem <- TodoRepository.get(Todo.Id(id))
+    } yield todoItem match {
+      case Some(todoItem) => Ok(Json.toJson(JsValueTodo(todoItem)))
+      case None           => NotFound
+    }
+  }
+
   def updatea(): Action[JsValue] = Action(parse.json).async { implicit req =>
     req.body
       .validate[JsValueTodoUpdate]
