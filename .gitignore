@@ -1,0 +1,13 @@
+logs
+target
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+.metals
+/RUNNING_PID
+docker/db/data/
+.bloop
+/.vscode
+.DS_Store

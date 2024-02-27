@@ -1,0 +1,12 @@
+@*
+TodoList
+*@
+@import lib.model.Todo
+@import views.html.components.TodoListItem
+@(todoItems: Seq[Todo])
+
+<ul>
+  @for(todoItem <- todoItems) {
+    @TodoListItem(todoItem)
+  }
+</ul>
