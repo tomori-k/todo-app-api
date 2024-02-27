@@ -292,4 +292,10 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
       case None     => Future.successful(NotFound("No such a ID"))
     }
   }
+
+  def deletea(id: Long): Action[AnyContent] = Action async { implicit req =>
+    TodoRepository
+      .remove(Todo.Id(id))
+      .map(_ => Ok)
+  }
 }
