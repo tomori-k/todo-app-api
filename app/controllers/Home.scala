@@ -3,6 +3,7 @@
 
 package controllers
 
+import json.reads.JsValueTodoCreate
 import json.writes.JsValueTodo
 import lib.model.Todo.TodoState
 import lib.model.{Todo, TodoCategory}
@@ -11,7 +12,7 @@ import model.ViewValueHome
 import play.api.data.Form
 import play.api.data.Forms.{longNumber, mapping, nonEmptyText, shortNumber}
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 
 import javax.inject._
@@ -80,15 +81,27 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
     )(UpdateFormData.apply)(UpdateFormData.unapply)
   )
 
-  def create(): Action[AnyContent] = Action async { implicit req =>
-    val vv = ViewValueHome(
-      title  = "新規作成",
-      cssSrc = Seq("main.css"),
-      jsSrc  = Seq("main.js")
-    )
-    for {
-      categories <- TodoCategoryRepository.getAll()
-    } yield Ok(views.html.pages.Create(vv, createForm, categories.map(_.v)))
+  def create(): Action[JsValue] = Action(parse.json).async { implicit req =>
+    req.body
+      .validate[JsValueTodoCreate]
+      .fold(
+        _ => {
+          Future.successful(BadRequest("Invalid body."))
+        },
+        todoCreate => {
+          TodoRepository
+            .add(
+              new Todo(
+                id         = None,
+                categoryId = TodoCategory.Id(todoCreate.categoryId),
+                title      = todoCreate.title,
+                body       = todoCreate.body,
+                state      = TodoState.Todo
+              ).toWithNoId
+            )
+            .map(_ => Ok)
+        }
+      )
   }
 
   def postCreate(): Action[AnyContent] = Action async { implicit req =>
