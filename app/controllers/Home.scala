@@ -52,9 +52,24 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents)(
 
   def get(id: Long): Action[AnyContent] = Action async { implicit req =>
     for {
-      todoItem <- TodoRepository.get(Todo.Id(id))
+      todoItem     <- TodoRepository.get(Todo.Id(id))
+      todoCategory <- todoItem match {
+                        case Some(todoItem) =>
+                          TodoCategoryRepository.get(
+                            TodoCategory.Id(todoItem.v.categoryId)
+                          )
+                        case None           => Future.successful(None)
+                      }
     } yield todoItem match {
-      case Some(todoItem) => Ok(Json.toJson(JsValueTodo(todoItem)))
+      case Some(todoItem) => {
+        val todoWithCategory =
+          todoItem.v.copy(category = todoCategory.map(_.v)).toEmbeddedId
+        Ok(
+          Json.toJson(
+            JsValueTodo(todoWithCategory)
+          )
+        )
+      }
       case None           => NotFound
     }
   }
