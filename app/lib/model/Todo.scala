@@ -34,4 +34,6 @@ object Todo extends JsonEnvReads {
     case object InProgress extends TodoState(code = 1, name = "進行中")
     case object Done       extends TodoState(code = 2, name = "完了")
   }
+
+  implicit val todoStateReads: Reads[TodoState] = enumReads(TodoState)
 }

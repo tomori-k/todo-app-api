@@ -91,7 +91,7 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)(
                                   title      = todoUpdate.title,
                                   body       = todoUpdate.body,
                                   categoryId = todoUpdate.categoryId,
-                                  state      = TodoState(todoUpdate.state)
+                                  state      = todoUpdate.state
                                 )
                               )
                             )
