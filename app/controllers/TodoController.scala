@@ -15,7 +15,7 @@ import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HomeController @Inject() (val controllerComponents: ControllerComponents)(
+class TodoController @Inject() (val controllerComponents: ControllerComponents)(
     implicit executionContext: ExecutionContext
 ) extends BaseController {
 
