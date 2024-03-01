@@ -4,7 +4,7 @@
 package controllers
 
 import json.reads.{JsValueTodoCreate, JsValueTodoUpdate}
-import json.writes.{JsValueTodo, JsValueTodoCategory}
+import json.writes.JsValueTodo
 import lib.model.Todo.TodoState
 import lib.model.{Todo, TodoCategory}
 import lib.persistence.default._
@@ -110,11 +110,5 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)(
     TodoRepository
       .remove(Todo.Id(id))
       .map(_ => Ok)
-  }
-
-  def getAllCategories(): Action[AnyContent] = Action async { implicit req =>
-    TodoCategoryRepository
-      .getAll()
-      .map(x => Ok(Json.toJson(x.map(y => JsValueTodoCategory(y)))))
   }
 }

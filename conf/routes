@@ -12,4 +12,4 @@ GET           /todo/$id<[0-9]+>          controllers.TodoController.get(id: Long
 POST          /todo                      controllers.TodoController.create
 PUT           /todo                      controllers.TodoController.update
 DELETE        /todo/$id<[0-9+]+>         controllers.TodoController.delete(id: Long)
-GET           /todo-category/list        controllers.TodoController.getAllCategories()
+GET           /todo-category/list        controllers.TodoCategoryController.getAll()
