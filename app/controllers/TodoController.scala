@@ -5,8 +5,8 @@ package controllers
 
 import json.reads.{JsValueTodoCreate, JsValueTodoUpdate}
 import json.writes.JsValueTodo
+import lib.model.Todo
 import lib.model.Todo.TodoState
-import lib.model.{Todo, TodoCategory}
 import lib.persistence.default._
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
@@ -39,7 +39,7 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)(
             .add(
               new Todo(
                 id         = None,
-                categoryId = TodoCategory.Id(todoCreate.categoryId),
+                categoryId = todoCreate.categoryId,
                 title      = todoCreate.title,
                 body       = todoCreate.body,
                 state      = TodoState.Todo
@@ -56,7 +56,7 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)(
       todoCategory <- todoItem match {
                         case Some(todoItem) =>
                           TodoCategoryRepository.get(
-                            TodoCategory.Id(todoItem.v.categoryId)
+                            todoItem.v.categoryId
                           )
                         case None           => Future.successful(None)
                       }
@@ -81,7 +81,7 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)(
         _ => Future.successful(BadRequest("Invalid body")),
         todoUpdate =>
           for {
-            todo   <- TodoRepository.get(Todo.Id(todoUpdate.id))
+            todo   <- TodoRepository.get(todoUpdate.id)
             result <- todo match {
                         case Some(x) =>
                           TodoRepository
@@ -90,8 +90,7 @@ class TodoController @Inject() (val controllerComponents: ControllerComponents)(
                                 _.copy(
                                   title      = todoUpdate.title,
                                   body       = todoUpdate.body,
-                                  categoryId =
-                                    TodoCategory.Id(todoUpdate.categoryId),
+                                  categoryId = todoUpdate.categoryId,
                                   state      = TodoState(todoUpdate.state)
                                 )
                               )

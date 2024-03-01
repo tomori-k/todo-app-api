@@ -1,11 +1,12 @@
 package json.reads
 
+import lib.model.TodoCategory
 import play.api.libs.json.{Json, Reads}
 
 case class JsValueTodoCreate(
     title:      String,
     body:       String,
-    categoryId: Long
+    categoryId: TodoCategory.Id
 )
 
 object JsValueTodoCreate {
